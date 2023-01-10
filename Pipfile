@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pysimplegui = "*"
+pysimpleguiqt = "*"
+pyside2 = "*"
+statsmodels = "*"
+matplotlib = "*"
+requests = "*"
+rich = "*"
+smbus = "*"
+ics = "*"
+caldav = "*"
+todoist-api-python = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
