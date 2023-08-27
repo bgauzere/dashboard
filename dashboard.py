@@ -1,4 +1,4 @@
-from stationmeteo.stationmeteo import ServeurMaison
+# from stationmeteo.stationmeteo import ServeurMaison
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
@@ -66,18 +66,18 @@ def agenda_content():
     return events_str
 
 
-def meteo_content():
-    serveur = ServeurMaison()
-    data_meteo = serveur.get_data()
-    str_meteo = ""
-    for id_source, data_source in data_meteo.items():
-        for donnee in data_source:
-            str_meteo = str_meteo + (f"{donnee} ")
-    return str_meteo
+# def meteo_content():
+#     serveur = ServeurMaison()
+#     data_meteo = serveur.get_data()
+#     str_meteo = ""
+#     for id_source, data_source in data_meteo.items():
+#         for donnee in data_source:
+#             str_meteo = str_meteo + (f"{donnee} ")
+#     return str_meteo
 
 
 def inbox_content():
-    with open('/home/bgauzere/notes/inbox.org') as inbox_file:
+    with open('/home/bgauzere/notes/postit.org') as inbox_file:
         content = inbox_file.read()
         return content
 
@@ -136,7 +136,8 @@ top_banner = [[sg.Text('Dashboard', font='Any 30', background_color=DARK_HEADER_
 
 
 block_meteo = [[sg.Text('Meteo', size=(50, 1), pad=BPAD_TOP, font='Any 20')],
-               [sg.Text(meteo_content(), font='Roboto 15')]]
+               [sg.Text("Travaux en Cours", font='Roboto 15')]]
+# [sg.Text(meteo_content(), font='Roboto 15')]]
 
 content = inbox_content()
 block_notes = [[sg.Text('Notes', font='Any 20')],
@@ -156,7 +157,7 @@ block_poids = [[sg.Text('Poids', font='Any 20')],
 
 
 layout = [[sg.Column(top_banner, size=(1024, 60), pad=BPAD_TOP, background_color=DARK_HEADER_COLOR)],
-          [sg.Column(block_meteo, size=(1024, 75), pad=BPAD_TOP)],
+          #          [sg.Column(block_meteo, size=(1024, 75), pad=BPAD_TOP)],
           [sg.Column(block_notes, size=(1024, 200), pad=BPAD_TOP,
                      scrollable=True,  vertical_scroll_only=True)],
           [sg.Column(block_todo, size=(512, 200), pad=BPAD_LEFT),
