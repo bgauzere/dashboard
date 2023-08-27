@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Dashboard
+Exec=/home/bgauzere/bin/dashboard.sh
+Terminal=false
+Icon=/home/bgauzere/dev/dashboard/dashboard.png
+X-GNOME-SingleWindow=true
+
