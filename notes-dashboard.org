@@ -1,0 +1,23 @@
+* Calendar pro
+abffbc36fa2e5acb10ff72a62e339d252f1e29c80fca7130900a5dc45b859959@group.calendar.google.com
+
+* Token
+(rm token.json, ou pas) et telecharger credentials.json ici : https://console.cloud.google.com/apis/credentials?hl=fr&inv=1&invt=AboFTA&project=x-victor-289713
+* Headliner
+
+Ever feel out of the loop when your friends are chatting about the latest news? With this automation script, you’ll never miss a beat! Just run it, and boom — news updates will pop right up on your desktop. Stay informed, stay in the game!
+
+from plyer import notification
+import requests
+import json
+country_code = input("Enter the country code for the news: ")
+api_key = input("Enter the api key: ")
+news = requests.get(
+    f'https://newsapi.org/v2/top-headlines?country={country_code}&apiKey={api_key}')
+data = json.loads(news.content)
+for i in range(10):
+    notification.notify(
+        title=data['articles'][i]['title'][:20],
+        message=data['articles'][i]['description'][:44],
+        timeout=5,
+        toast=False)

@@ -15,6 +15,12 @@ smbus = "*"
 ics = "*"
 caldav = "*"
 todoist-api-python = "*"
+icalendar = "*"
+google-auth = "*"
+google-auth-oauthlib = "*"
+google-auth-httplib2 = "*"
+google-api-python-client = "*"
+tz = "*"
 
 [dev-packages]
 
