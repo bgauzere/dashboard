@@ -149,8 +149,8 @@ for todo in todo_content():
     block_todo.append([sg.T(f"  •{todo}", font='Any 10')])
 
 block_agenda = [[sg.Text('Agenda', font='Any 20')]]
-for event in agenda_content():
-    block_agenda.append([sg.T(event, font='Any 10')])
+#for event in agenda_content():
+#    block_agenda.append([sg.T(event, font='Any 10')])
 
 block_poids = [[sg.Text('Poids', font='Any 20')],
                [sg.Canvas(key='-CANVAS-')]]

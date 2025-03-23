@@ -18,8 +18,9 @@ SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 def get_credentials():
     """Retrieve or refresh Google API credentials."""
     creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    TOKEN_PATH = os.path.expanduser("~/.config/gcal_token.json")
+    if os.path.exists(TOKEN_PATH):
+        creds = Credentials.from_authorized_user_file(TOKEN_PATH, SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -27,8 +28,8 @@ def get_credentials():
             flow = InstalledAppFlow.from_client_secrets_file(
                 "credentials.json", SCOPES
             )
-            creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
+            creds = flow.run_local_server(port=0, access_type="offline", prompt="consent")
+        with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
     return creds
 
@@ -116,9 +117,12 @@ def main():
 
     print("\nThis week's events:")
     week_events = get_week_events(service, calendar_ids)
+    week_events.sort(key=lambda event: event["start"].get("dateTime", event["start"].get("date")))
     for event in week_events:
         time_range = format_event_time(event)
-        print(f"{time_range} {event['summary']}")
+        event_date = datetime.datetime.fromisoformat(event["start"].get("dateTime", event["start"].get("date")))
+        day_of_week = event_date.strftime("%A")
+        print(f"{day_of_week} {time_range} {event['summary']}")
 
 
 if __name__ == "__main__":

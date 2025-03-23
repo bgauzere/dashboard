@@ -1,3 +1,7 @@
+"""
+Module pour récupérer les events de ICAL sur l'ISNA Rouen
+"""
+
 import datetime
 import requests
 import icalendar
