@@ -1,5 +1,6 @@
-* Calendar pro
-abffbc36fa2e5acb10ff72a62e339d252f1e29c80fca7130900a5dc45b859959@group.calendar.google.com
+* TODO
+** pour avoir le jour tempo d'aujourd'hui et demain : https://tempo.lhoir.me/api/now (à mettre dans le dashboard ?)
+** Pour le dashboard, dire au LLM de ne pas hésiter à synthétiser en mettant en correspodances les trucs, notamment l'agenda et les taches.
 
 * Token
 (rm token.json, ou pas) et telecharger credentials.json ici : https://console.cloud.google.com/apis/credentials?hl=fr&inv=1&invt=AboFTA&project=x-victor-289713
@@ -21,3 +22,29 @@ for i in range(10):
         message=data['articles'][i]['description'][:44],
         timeout=5,
         toast=False)
+
+* Fonctionnalités:
+    Météo
+    Statut mangeoire
+    Onglet corvées :
+        Liste des corvées, avec derniere date pour chacune
+        Case à cocher pour dire qu'elle est faite
+        Possibilité d'ajouter une nouvelle corvée
+    Tracking temps boulot (~/dev/tracking.csv)
+    Journal (~/dev/easynote/easyjournal)
+    Outil d'analyse de semaines avec LLM (TODO)
+
+* Idées
+** App du matin
+    récupérer les taches du jour
+    la méteo
+    récuperer les evenements du jour (sur ical et gcal)
+    l'agenda
+    les news
+    les passer dans un LLM pour faire un résumé
+
+** App check routine du soir
+    Journal
+    Fatigue : curseur de 0 à 10
+    avancée taches projet/prio de la semaine
+    Impressions texte libre

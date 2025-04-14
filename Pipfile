@@ -21,6 +21,11 @@ google-auth-oauthlib = "*"
 google-auth-httplib2 = "*"
 google-api-python-client = "*"
 tz = "*"
+openai = "*"
+feedparser = "*"
+gtts = "*"
+python-dotenv = "*"
+pyperclip = "*"
 
 [dev-packages]
 

@@ -54,7 +54,32 @@ def get_all_tasks_from_this_week():
     tasks_rapid = [task for task in tasks_in_text if '@rapide' in task]
     tasks = [task for task in tasks_in_text if '@rapide' not in task]
     return tasks, tasks_rapid
+
+def get_tasks_due_today():
+    with open('./todoist.token', 'r') as token_file:
+        api_token = token_file.read().strip()
+    api = TodoistAPI(api_token)
+
+    today_str = datetime.now().date().isoformat()
+    tasks_due_today = []
+
+    all_tasks = api.get_tasks()
+    for task in all_tasks:
+        if task.due and task.due.date == today_str:
+            priority_label = {1: "🟢 Faible", 2: "🟡 Moyenne", 3: "🟠 Haute", 4: "🔴 Critique"}.get(task.priority, "Inconnue")
+            tasks_due_today.append(f"{task.content} (Priorité : {priority_label})")
+    return tasks_due_today
+
+
+
 if __name__ == '__main__':
+    tasks_today = get_tasks_due_today()
+
+    print(f"{len(tasks_today)} tâches à réaliser aujourd'hui:")
+    for t in tasks_today:
+        print(t)
+        
+
     tasks, tasks_rapid = get_all_tasks_from_this_week()
 
     print(f"{len(tasks)} tâches réalisées:")

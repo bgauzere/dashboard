@@ -2,10 +2,11 @@
 
 Ce projet regroupe plusieurs scripts pour extraire et visualiser les événements de vos calendriers personnels, les tâches terminées et vos activités sportives Strava, dans l’objectif de construire un **dashboard personnel automatisé**.
 
+Il inclut également un générateur de **résumé quotidien** avec météo, tâches, événements et actualités, envoyé chaque matin par e-mail avec une version audio.
+
 ---
 
 ## 📦 Installation avec Pipenv
-
 ```bash
 pipenv install
 pipenv shell
@@ -15,14 +16,15 @@ Assurez-vous que les fichiers suivants soient présents :
 - `credentials.json` (Google Calendar API)
 - `todoist.token` (Token API Todoist)
 - `strava_credentials.json` (Infos client_id / secret / refresh_token Strava)
+- `.env` (voir section configuration)
 
 ---
 
 ## 🔧 Dépendances (gérées automatiquement par Pipenv)
-
 - `google-auth`, `google-auth-oauthlib`, `google-api-python-client`
 - `todoist-api-python`
-- `icalendar`, `pytz`, `requests`
+- `icalendar`, `pytz`, `requests`, `feedparser`
+- `openai`, `gTTS`, `python-dotenv`
 
 ---
 
@@ -89,6 +91,31 @@ En fin de script :
 
 ---
 
+### `generate_daily_summary.py`
+🧠 **Génère un résumé quotidien intelligent avec événements, tâches, météo et actualités**
+
+- Utilise OpenAI (`gpt-3.5-turbo`) ou Hugging Face (`Mixtral-8x7B`) pour résumer
+- Envoie le résumé par **email** avec une version **audio MP3** jointe
+- Peut afficher une **notification locale** (via `plyer`, optionnel)
+
+**Usage :**
+```bash
+python generate_daily_summary.py
+```
+
+#### Exemple de fichier `.env` :
+```env
+OPENAI_API_KEY=sk-...
+HF_API_TOKEN=hf-...
+EMAIL_SENDER=ton.email@gmail.com
+EMAIL_PASSWORD=mot_de_passe_application
+EMAIL_RECIPIENT=ton.email@gmail.com
+```
+
+> ⚠️ Utilise un [mot de passe d'application Gmail](https://support.google.com/accounts/answer/185833?hl=fr)
+
+---
+
 ## 🔐 Authentification
 
 ### 🔸 Google Calendar
@@ -108,35 +135,43 @@ En fin de script :
 ```bash
 python init_strava_authorization.py
 ```
-   - Le script génère un lien d’autorisation avec les scopes `read,activity:read_all`
-   - Ouvre le navigateur automatiquement
-   - Tu colles le `code=` reçu dans le terminal
-   - Il échange ce code contre un `refresh_token` stocké dans `strava_credentials.json`
-
-📚 Plus d'infos :
-- https://developers.strava.com/docs/authentication/
-- https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities
 
 ---
 
-## 📂 Structure suggérée du projet (mise à jour)
+## 📂 Structure suggérée du projet
 ```
 dashboard/
-├── Pipfile
-├── Pipfile.lock
-├── credentials.json
-├── todoist.token
+├── generate_daily_summary.py
 ├── gcal.py
 ├── ical.py
 ├── extract_task_todoist.py
 ├── extract_strava.py
-├── strava_utils.py
 ├── init_strava_authorization.py
-├── strava_credentials.json  ← généré automatiquement
-└── strava.token             ← généré automatiquement
+├── strava_utils.py
+├── .env
+├── todoist.token
+├── credentials.json
+├── strava_credentials.json
+├── strava.token
+└── Pipfile / Pipfile.lock
 ```
 
 ---
 
-## 🚀 Prochaine étape : Intégration dans un dashboard web (Flask, Streamlit, etc.)
+## 🕓 Automatisation (cron)
+Exemple : lancer tous les jours à 7h du matin
+```cron
+0 7 * * * /chemin/vers/.venv/bin/python /chemin/vers/generate_daily_summary.py
+```
+
+---
+
+## 🧠 TODO ou améliorations futures
+- Export Markdown ou HTML
+- Ajout de notifications mobiles (Pushbullet, Gotify...)
+- Interface Web type Streamlit ou Flask
+
+---
+
+> Un assistant personnel simple, intelligent et entièrement personnalisable 🚀
 

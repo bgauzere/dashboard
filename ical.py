@@ -6,6 +6,10 @@ import datetime
 import requests
 import icalendar
 import pytz
+from dotenv import load_dotenv
+import os
+
+
 
 
 def fetch_ical_events(ical_url):
@@ -69,11 +73,13 @@ def format_event_time(event, timezone):
 
 
 if __name__ == "__main__":
-    # iCal URL for the INSA calendar
-    ical_url = "https://ade.insa-rouen.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?calType=ical&projectId=8&resources=356&firstDate=2024-08-01&lastDate=2025-07-31"
-
+    
     # Define timezone
     timezone = pytz.timezone("Europe/Paris")
+    # Load environment variables from .env file
+    load_dotenv()
+    # iCal URL for the INSA calendar
+    ical_url = os.getenv("ICAL_URL")
 
     # Fetch and parse the calendar
     calendar = fetch_ical_events(ical_url)
