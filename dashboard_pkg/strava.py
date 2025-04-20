@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import locale
 import requests
 from collections import defaultdict
-from strava_utils import get_valid_access_token
+from dashboard_pkg.strava_utils import get_valid_access_token
 
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 

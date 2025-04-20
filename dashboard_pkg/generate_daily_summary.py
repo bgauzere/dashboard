@@ -9,9 +9,9 @@ import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
 
-from gcal import complete_today_events, format_event_time
-from ical import fetch_ical_events, get_day_events, format_event_time as format_ical_time
-from extract_task_todoist import get_tasks_due_today
+from dashboard_pkg.gcal import complete_today_events, format_event_time
+from dashboard_pkg.ical import fetch_ical_events, get_day_events, format_event_time as format_ical_time
+from dashboard_pkg.extract_task_todoist import get_tasks_due_today
 
 
 def get_today_weather(lat=49.4431, lon=1.0993):

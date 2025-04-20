@@ -2,10 +2,10 @@ import os
 import glob
 import pytz
 from datetime import datetime
-from extract_task_todoist import get_all_tasks_from_this_week
-from strava import get_activities_this_week
-from gcal import get_credentials, get_week_events, format_event_time, build
-from ical import fetch_ical_events, get_week_events as get_week_events_ical, format_event_time as format_ical_time
+from dashboard_pkg.extract_task_todoist import get_all_tasks_from_this_week
+from dashboard_pkg.strava import get_activities_this_week
+from dashboard_pkg.gcal import get_credentials, get_week_events, format_event_time, build
+from dashboard_pkg.ical import fetch_ical_events, get_week_events as get_week_events_ical, format_event_time as format_ical_time
 import pyperclip
 from dotenv import load_dotenv
 

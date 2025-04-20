@@ -138,22 +138,54 @@ python init_strava_authorization.py
 
 ---
 
+## 🚀 CLI centralisé & Version Web
+
+Tous les scripts sont disponibles via la commande `dashboard` :
+
+```bash
+python dashboard.py <commande>
+```
+
+Commandes :
+- gcal        : événements Google Calendar (aujourd’hui et cette semaine)
+- ical        : événements iCal INSA (aujourd’hui et cette semaine)
+- tasks       : tâches Todoist (à réaliser aujourd’hui et celles terminées cette semaine)
+- strava      : activités Strava de la semaine
+- daily       : résumé quotidien (envoi e-mail + audio)
+- weekly      : résumé hebdomadaire (fichier + presse-papiers)
+- serve       : version web (Flask, dépendance optionnelle)
+
+Exemples :
+```bash
+python dashboard.py gcal
+python dashboard.py daily
+python dashboard.py serve --host 0.0.0.0 --port 8080
+```
+
 ## 📂 Structure suggérée du projet
 ```
-dashboard/
-├── generate_daily_summary.py
-├── gcal.py
-├── ical.py
-├── extract_task_todoist.py
-├── extract_strava.py
-├── init_strava_authorization.py
-├── strava_utils.py
-├── .env
-├── todoist.token
+.
+├── dashboard.py              # CLI central
+├── dashboard_gui.py          # Version PySimpleGUI legacy (facultatif)
 ├── credentials.json
+├── todoist.token
 ├── strava_credentials.json
 ├── strava.token
-└── Pipfile / Pipfile.lock
+├── Pipfile / Pipfile.lock
+├── .env
+├── .gitignore
+└── dashboard_pkg/
+    ├── __init__.py
+    ├── gcal.py
+    ├── ical.py
+    ├── extract_task_todoist.py
+    ├── strava_utils.py
+    ├── strava.py
+    ├── init_strava.py
+    ├── generate_daily_summary.py
+    ├── get_todoist_mails.py
+    ├── weekly_summary.py
+    └── web.py
 ```
 
 ---

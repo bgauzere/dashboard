@@ -63,11 +63,24 @@ def get_tasks_due_today():
     today_str = datetime.now().date().isoformat()
     tasks_due_today = []
 
+    # Retrieve all tasks and flatten any nested lists
     all_tasks = api.get_tasks()
-    for task in all_tasks:
-        if task.due and task.due.date == today_str:
-            priority_label = {1: "🟢 Faible", 2: "🟡 Moyenne", 3: "🟠 Haute", 4: "🔴 Critique"}.get(task.priority, "Inconnue")
-            tasks_due_today.append(f"{task.content} (Priorité : {priority_label})")
+    flattened_tasks = []
+    for item in all_tasks:
+        if isinstance(item, list):
+            flattened_tasks.extend(item)
+        else:
+            flattened_tasks.append(item)
+    # Filter tasks due today with safe attribute access
+    for task in flattened_tasks:
+        due = getattr(task, 'due', None)
+        if due and getattr(due, 'date', None) == today_str:
+            priority_label = {
+                1: "🟢 Faible", 2: "🟡 Moyenne",
+                3: "🟠 Haute", 4: "🔴 Critique"
+            }.get(getattr(task, 'priority', None), "Inconnue")
+            content = getattr(task, 'content', str(task))
+            tasks_due_today.append(f"{content} (Priorité : {priority_label})")
     return tasks_due_today
 
 
