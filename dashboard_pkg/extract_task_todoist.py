@@ -74,7 +74,7 @@ def get_tasks_due_today():
     # Filter tasks due today with safe attribute access
     for task in flattened_tasks:
         due = getattr(task, 'due', None)
-        if due and getattr(due, 'date', None) == today_str:
+        if due and getattr(due, 'date', None).isoformat() == today_str:
             priority_label = {
                 1: "🟢 Faible", 2: "🟡 Moyenne",
                 3: "🟠 Haute", 4: "🔴 Critique"
