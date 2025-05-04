@@ -74,13 +74,25 @@ def get_tasks_due_today():
     # Filter tasks due today with safe attribute access
     for task in flattened_tasks:
         due = getattr(task, 'due', None)
-        if due and getattr(due, 'date', None).isoformat() == today_str:
-            priority_label = {
-                1: "🟢 Faible", 2: "🟡 Moyenne",
-                3: "🟠 Haute", 4: "🔴 Critique"
-            }.get(getattr(task, 'priority', None), "Inconnue")
-            content = getattr(task, 'content', str(task))
-            tasks_due_today.append(f"{content} (Priorité : {priority_label})")
+        if due:
+            time = None
+            due_date = getattr(due, 'date', None) #can be a date or datetime
+            if isinstance(due_date, datetime):
+                time = due_date.time()
+                due_date = due_date.date()
+            #print(due_date.isoformat(),today_str)
+            # test if  duedate is today
+            if due_date == datetime.now().date():   
+                priority_label = {
+                    1: "🟢 Faible", 2: "🟡 Moyenne",
+                    3: "🟠 Haute", 4: "🔴 Critique"
+                }.get(getattr(task, 'priority', None), "Inconnue")
+                content = getattr(task, 'content', str(task))
+                if time:
+                    content = f"à {time.strftime('%H:%M')} : {content}"
+                tasks_due_today.append(f"{content} (Priorité : {priority_label})")
+    # Sort tasks by priority
+    tasks_due_today.sort(key=lambda task: task.split("Priorité : ")[-1])
     return tasks_due_today
 
 

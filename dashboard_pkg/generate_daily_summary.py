@@ -146,7 +146,6 @@ def generate_summary():
         summary = summarize_with_huggingface(full_text)
     
     print(summary)
-
     generate_and_send_summary(summary)
 
 def get_today_news(rss_url="https://www.lemonde.fr/rss/une.xml", max_items=5):
@@ -170,6 +169,68 @@ def generate_and_send_summary(summary_text):
         body=summary_text,
         attachment_path=audio_path
     )
+    export_to_html(summary_text)
+    
+
+def export_to_html(summary_text, output_path="daily_summary.html"):
+    date_str = datetime.now().strftime("%A %d %B %Y")
+    html_content = f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Résumé du {date_str}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {{
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f7f9fc;
+      color: #333;
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }}
+    h1 {{
+      text-align: center;
+      color: #2c3e50;
+    }}
+    .summary {{
+      white-space: pre-wrap;
+      line-height: 1.5;
+      margin-top: 2rem;
+      background: #ffffff;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: 8px;
+    }}
+    audio {{
+      display: block;
+      margin: 2rem auto;
+      width: 100%;
+    }}
+    footer {{
+      text-align: center;
+      font-size: 0.9em;
+      color: #777;
+      margin-top: 2rem;
+    }}
+  </style>
+</head>
+<body>
+  <h1>Résumé du {date_str}</h1>
+  <audio controls>
+    <source src="daily_summary.mp3" type="audio/mpeg">
+    Ton navigateur ne supporte pas l'audio.
+  </audio>
+  <div class="summary">
+    {summary_text}
+  </div>
+  <footer>Généré automatiquement avec ❤️</footer>
+</body>
+</html>"""
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
 
 if __name__ == "__main__":
     generate_summary()
