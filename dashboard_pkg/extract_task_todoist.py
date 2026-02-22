@@ -3,56 +3,124 @@ from datetime import datetime, timedelta
 from todoist_api_python.api import TodoistAPI
 import locale
 
-locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+import requests
+from datetime import datetime, timedelta
+import locale
 
-def is_recurring_and_project_name(task, headers):
-    item_id = task.get("v2_task_id")
-    item_parameters = {"item_id": item_id, "all_data": True}
-    item_response = requests.post('https://api.todoist.com/sync/v9/items/get', json=item_parameters, headers=headers)
-    json_response = item_response.json()
+# Essayer de définir la locale
+try:
+    locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_TIME, '')
 
-    item = json_response.get('item')
-    project = json_response.get('project', {})
 
-    if item:
-        due = item.get('due')
-        is_recurring = due.get('is_recurring') if due else False
-        project_name = project.get('name', 'Inconnu')
-        return is_recurring, project_name
-    else:
-        return False, project.get('name', 'Inconnu')
-
+def get_all_projects_map():
+    """
+    Récupère la liste des projets via le SDK Python officiel.
+    Gère la pagination en parcourant les pages (listes) renvoyées.
+    """
+    try:
+        with open('./todoist.token', 'r') as token_file:
+            api_token = token_file.read().strip()
+            
+        api = TodoistAPI(api_token)
+        projects_paginator = api.get_projects()
+        
+        project_map = {}
+        
+        # On itère sur le paginator (qui nous donne des "pages" / listes)
+        for page in projects_paginator:
+            # Si la page est bien une liste, on itère sur les projets à l'intérieur
+            if isinstance(page, list):
+                for project in page:
+                    project_map[project.id] = project.name
+            else:
+                # Fallback au cas où le SDK changerait encore et renverrait l'objet direct
+                project_map[page.id] = page.name
+                
+        return project_map
+        
+    except Exception as e:
+        print(f"Exception lors de la récupération des projets via SDK: {e}")
+        return {}
+    
 def get_all_tasks_from_this_week():
     with open('./todoist.token', 'r') as token_file:
         api_token = token_file.read().strip()
+    
     headers = {
-        'Authorization': f'Bearer {api_token}'
+        'Authorization': f'Bearer {api_token}',
+        'Content-Type': 'application/json'
     }
 
-    # Définir les dates de début et de fin (cette semaine)
+    # 1. On charge la carte des projets (ID -> Nom) UNE SEULE FOIS au début
+    project_map = get_all_projects_map()
+    #project_map = get_all_projects_map(headers)
+
+    # Définir les dates
     start_date = (datetime.now() - timedelta(days=datetime.now().weekday())).strftime('%Y-%m-%dT00:00:00Z')
     end_date = datetime.now().strftime('%Y-%m-%dT23:59:59Z')
 
     parameters = {"limit": 200, "since": start_date, "until": end_date}
-    response = requests.post('https://api.todoist.com/sync/v9/completed/get_all', json=parameters, headers=headers)
+    
+    # 2. Appel principal (celui qui marche maintenant)
+    response = requests.get('https://api.todoist.com/api/v1/tasks/completed/by_completion_date', params=parameters, headers=headers)
+    
+    # Vérification de sécurité
+    if response.status_code != 200:
+        print(f"Erreur API Tasks: {response.text}")
+        return [], []
+
+    # Extraction des items (gestion de la structure de réponse qui peut varier légèrement)
+    data = response.json()
+    items = data.get('items', []) if isinstance(data, dict) else data
+
     tasks_this_week = [
-        task for task in response.json().get('items', [])
+        task for task in items
         if '@no_special_date' not in task.get('content', '')
     ]
+
     tasks_in_text = []
-    tasks_this_week.sort(key=lambda task: datetime.strptime(task['completed_at'], '%Y-%m-%dT%H:%M:%S.%fZ'))
+    
+    # Tri par date
+    # Note: Votre JSON montre 'completed_at' avec des microsecondes (.%f), donc on garde votre format de tri
+    try:
+        tasks_this_week.sort(key=lambda task: datetime.strptime(task['completed_at'], '%Y-%m-%dT%H:%M:%S.%fZ'))
+    except ValueError:
+        # Fallback si jamais le format change (sans microsecondes)
+        tasks_this_week.sort(key=lambda task: task.get('completed_at'))
+
     for task in tasks_this_week:
-        is_recurring, project_name = is_recurring_and_project_name(task,headers)
-        if not(is_recurring):
-            # Set the locale to French
-            
-            completed_date = datetime.strptime(task['completed_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
-            formatted_date = completed_date.strftime('%A %d %B')
+        # --- OPTIMISATION : PLUS D'APPEL API ICI ---
+        
+        # 1. Récupérer la récurrence directement depuis l'objet task
+        due_info = task.get('due')
+        is_recurring = due_info.get('is_recurring') if due_info else False
+
+        if not is_recurring:
+            # 2. Récupérer le nom du projet via notre map locale
+            p_id = task.get('project_id')
+            project_name = project_map.get(str(p_id), "Projet inconnu")
+
+            # Formatage de la date
+            # On retire le 'Z' pour éviter les soucis sur certaines versions de Python
+            date_str_raw = task['completed_at'].replace('Z', '')
+            # On tronque les microsecondes si nécessaire pour strptime ou on utilise fromisoformat
+            try:
+                if '.' in date_str_raw:
+                    completed_date = datetime.strptime(date_str_raw, '%Y-%m-%dT%H:%M:%S.%f')
+                else:
+                    completed_date = datetime.strptime(date_str_raw, '%Y-%m-%dT%H:%M:%S')
+                
+                formatted_date = completed_date.strftime('%A %d %B')
+            except ValueError:
+                formatted_date = task['completed_at']
+
             tasks_in_text.append(f"{task['content']}, Complétée le : {formatted_date} du projet : {project_name}")
-        # Exemple de récupération d'une tâche spécifique avec son ID
     
     tasks_rapid = [task for task in tasks_in_text if '@rapide' in task]
     tasks = [task for task in tasks_in_text if '@rapide' not in task]
+    
     return tasks, tasks_rapid
 
 def get_tasks_due_today():
