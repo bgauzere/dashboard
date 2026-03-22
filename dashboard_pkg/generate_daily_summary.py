@@ -1,4 +1,5 @@
 import os
+import subprocess
 import pytz
 from datetime import datetime
 import feedparser
@@ -170,6 +171,7 @@ def generate_and_send_summary(summary_text):
         attachment_path=audio_path
     )
     export_to_html(summary_text)
+    send_files_via_scp()
     
 
 def export_to_html(summary_text, output_path="daily_summary.html"):
@@ -179,7 +181,11 @@ def export_to_html(summary_text, output_path="daily_summary.html"):
 <head>
   <meta charset="UTF-8">
   <title>Résumé du {date_str}</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#2c3e50">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="icon192.png">
   <style>
     body {{
       font-family: 'Segoe UI', sans-serif;
@@ -231,6 +237,23 @@ def export_to_html(summary_text, output_path="daily_summary.html"):
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_content)
 
+
+
+def send_files_via_scp(html_path="daily_summary.html", mp3_path="daily_summary.mp3"):
+    user = "benoit"  # ou 'root' si nécessaire
+    host = "benauit.nohost.me"
+    remote_path = "/home/benoit/dashboard"
+
+    if not os.path.exists(html_path) or not os.path.exists(mp3_path):
+        print("❌ Fichiers à copier introuvables.")
+        return
+
+    try:
+        subprocess.run(["scp", html_path, f"{user}@{host}:{remote_path}/"], check=True)
+        subprocess.run(["scp", mp3_path, f"{user}@{host}:{remote_path}/"], check=True)
+        print("✅ Fichiers envoyés avec succès par SCP.")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Échec de l'envoi par SCP : {e}")
 
 if __name__ == "__main__":
     generate_summary()

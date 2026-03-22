@@ -79,7 +79,7 @@ def generate_summary():
 
 ---
 
-✅ **Tâches terminées (hors @rapide)**  
+✅ **Tâches terminées (hors @rapide) — {len(tasks)}**  
 {chr(10).join(f"- {t}" for t in tasks)}
 
 ⚡ **Tâches @rapide**  
